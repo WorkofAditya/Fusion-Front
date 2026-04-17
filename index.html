@@ -42,9 +42,11 @@ body {
   padding: 0 22px;
   background: var(--panel);
   border-bottom: 2px solid rgba(17, 24, 39, 0.22);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   position: sticky;
   top: 0;
   backdrop-filter: blur(10px);
+  z-index: 1000;
 }
 
 .brand {
@@ -260,7 +262,6 @@ body {
       <h1 class="logo">FUSION</h1>
 
       <div class="search-wrap">
-        <h3>Search products</h3>
         <div class="search-row">
           <input type="text" placeholder="Find nearby products..." aria-label="Search products">
           <button aria-label="Open filter menu">☰</button>
@@ -278,11 +279,11 @@ body {
       <h2 class="shops-title">Suggested shops</h2>
 
       <section class="shops" aria-label="Suggested shops">
-<article class="shop-card">Tech Hub Store</article>
-<article class="shop-card">Urban Electronics</article>
-<article class="shop-card">Gadget Street</article>
-<article class="shop-card">HomeKart</article>
-<article class="shop-card">SmartZone</article>
+        <article class="shop-card">Tech Hub Store</article>
+        <article class="shop-card">Urban Electronics</article>
+        <article class="shop-card">Gadget Street</article>
+        <article class="shop-card">HomeKart</article>
+        <article class="shop-card">SmartZone</article>
       </section>
     </section>
   </main>
