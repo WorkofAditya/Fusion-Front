@@ -3,78 +3,288 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <title>Fusion</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+:root {
+  --ink: #111827;
+  --muted: #6b7280;
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --accent: #2563eb;
+  --soft: rgba(17, 24, 39, 0.08);
+  --surface: #ffffff;
+--surface-2: #f9fafb;
+--border: rgba(17, 24, 39, 0.08);
+--shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
 
-    .container {
-      text-align: center;
-      max-width: 400px;
-      padding: 20px;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: #ffffff;
+  color: var(--ink);
+}
 
-    .tagline {
-      font-size: 1.2rem;
-      color: #94a3b8;
-      margin-bottom: 20px;
-    }
+.app {
+  min-height: 100vh;
+}
 
-    .coming {
-      font-size: 1.5rem;
-      margin-bottom: 30px;
-    }
+.nav {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  background: var(--panel);
+  border-bottom: 2px solid rgba(17, 24, 39, 0.22);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(10px);
+}
 
-    .contact {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 10px;
-    }
+.brand {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
 
-    .contact h2 {
-      margin-bottom: 10px;
-    }
+.settings {
+  font-size: 1.1rem;
+  opacity: 0.7;
+  cursor: pointer;
+}
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 42px 24px;
+}
 
-    li {
-      margin: 5px 0;
-    }
+.logo {
+  text-align: center;
+  font-family: "Space Grotesk", system-ui;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin: 10px 0 36px;
+}
+
+.search-wrap {
+  max-width: 520px;
+  margin: 0 auto 42px;
+}
+
+.search-wrap h3 {
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: 999px;
+  padding: 6px;
+  gap: 6px;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08),
+              0 10px 25px rgba(0, 0, 0, 0.06);
+  transition: 0.2s;
+}
+
+.search-row input {
+  flex: 1;
+  height: 44px;
+  border: none;
+  outline: none;
+  padding: 0 14px;
+  font-size: 1rem;
+  background: transparent;
+}
+
+.search-row button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.search-row button:hover {
+  background: #e5e7eb;
+}
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 30px 0 50px;
+}
+
+.category {
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid var(--soft);
+  cursor: pointer;
+  transition: 0.2s;
+  color: #111827;
+}
+
+.cat-gaming {
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+}
+
+.cat-electronics {
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.cat-home {
+  background: #fef9c3;
+  border-color: #fde68a;
+}
+
+.cat-gadgets {
+  background: #ffe4e6;
+  border-color: #fecdd3;
+}
+
+.cat-stationary {
+  background: #ede9fe;
+  border-color: #ddd6fe;
+}
+
+.category:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+.cat-gaming,
+.cat-electronics,
+.cat-home,
+.cat-gadgets,
+.cat-stationary {
+  background: white;
+}
+
+.shops-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 10px 0 16px;
+  color: var(--ink);
+}
+
+.shops {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.shop-card {
+  background: white;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 18px;
+  min-height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.05),
+              0 6px 18px rgba(0, 0, 0, 0.04);
+  transition: 0.25s ease;
+}
+
+.shop-card::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 50%;
+}
+
+.shop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+
+@media (max-width: 980px) {
+  .shops {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .shops {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .shops {
+    grid-template-columns: 1fr;
+  }
+}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Fusion</h1>
-    <p class="tagline">Find it, Nearby</p>
-    <p class="coming">Coming Soon</p>
+  <main class="app">
+    <nav class="nav">
+      <div class="brand">fusionn.in</div>
+      <div class="settings" aria-hidden="true">⚙</div>
+    </nav>
 
-    <div class="contact">
-      <h2>Developers</h2>
-      <p>Fusion4 Team</p>
-      <ul>
-        <li>Adityasinh Sodha</li>
-        <li>Adityarajsinh Jadav</li>
-        <li>Madhav Tank</li>
-        <li>Prince Chovatiya</li>
-      </ul>
-    </div>
-  </div>
+    <section class="content">
+      <h1 class="logo">FUSION</h1>
+
+      <div class="search-wrap">
+        <h3>Search products</h3>
+        <div class="search-row">
+          <input type="text" placeholder="Find nearby products..." aria-label="Search products">
+          <button aria-label="Open filter menu">☰</button>
+        </div>
+      </div>
+
+      <section class="categories" aria-label="Product categories">
+        <div class="category cat-gaming">Gaming accessories</div>
+        <div class="category cat-electronics">Electronic items</div>
+        <div class="category cat-home">Home appliances</div>
+        <div class="category cat-gadgets">Gadgets</div>
+        <div class="category cat-stationary">Stationary items</div>
+      </section>
+
+      <h2 class="shops-title">Suggested shops</h2>
+
+      <section class="shops" aria-label="Suggested shops">
+<article class="shop-card">Tech Hub Store</article>
+<article class="shop-card">Urban Electronics</article>
+<article class="shop-card">Gadget Street</article>
+<article class="shop-card">HomeKart</article>
+<article class="shop-card">SmartZone</article>
+      </section>
+    </section>
+  </main>
 </body>
 </html>
