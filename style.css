@@ -132,71 +132,15 @@ body {
   border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 500;
-  border: 1px solid var(--soft);
-  cursor: pointer;
-  transition: 0.2s;
+  border: 1px solid var(--border);
+  background: #ffffff;
   color: #111827;
-}
-
-.cat-gaming {
-  background: #e0e7ff;
-  border-color: #c7d2fe;
-}
-
-.cat-electronics {
-  background: #dcfce7;
-  border-color: #bbf7d0;
-}
-
-.cat-home {
-  background: #fef9c3;
-  border-color: #fde68a;
-}
-
-.cat-gadgets {
-  background: #ffe4e6;
-  border-color: #fecdd3;
-}
-
-.cat-stationary {
-  background: #ede9fe;
-  border-color: #ddd6fe;
-}
-
-.category {
+  cursor: pointer;
   transition: 0.25s;
 }
 
-.cat-gaming:hover {
-  background: #c7d2fe;
-}
-
-.cat-electronics:hover {
-  background: #bbf7d0;
-}
-
-.cat-home:hover {
-  background: #fde68a;
-}
-
-.cat-gadgets:hover {
-  background: #fecdd3;
-}
-
-.cat-stationary:hover {
-  background: #ddd6fe;
-}
-
 .category:hover {
-  color: #111827;
-}
-
-.cat-gaming,
-.cat-electronics,
-.cat-home,
-.cat-gadgets,
-.cat-stationary {
-  background: white;
+  background: var(--border);
 }
 
 .shops-title {
@@ -335,3 +279,4 @@ body {
 }
 
 }
+
