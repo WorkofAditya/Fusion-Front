@@ -1,8 +1,21 @@
 const shopsContainer = document.getElementById("shops")
-const categoriesContainer = document.getElementById("categories")
 const usedColors = new Map()
+const categoriesContainer = document.getElementById("categories")
+
+const loader = document.getElementById("loader")
+
+function showLoader(){
+  if(loader) loader.classList.remove("hidden")
+}
+
+function hideLoader(){
+  if(loader) loader.classList.add("hidden")
+}
 
 async function loadData() {
+
+  showLoader()
+
   try {
 
     const shopsRes = await fetch("https://fusion-back.onrender.com/shops")
@@ -13,7 +26,6 @@ async function loadData() {
         `<article class="shop-card">${shop.name}</article>`
       ).join("")
     }
-
 
     const catRes = await fetch("https://fusion-back.onrender.com/categories")
     const categories = await catRes.json()
@@ -26,7 +38,7 @@ async function loadData() {
 
         const shown = expanded
           ? categories
-          : categories.slice(0, 8)
+          : categories.slice(0,8)
 
         const hiddenCount = categories.length - 8
 
@@ -35,36 +47,13 @@ async function loadData() {
           const color = getColor(cat)
 
           return `
-            <div class="category"
-                 style="--border:${color};">
-              ${cat}
-            </div>
+          <div class="category"
+               style="--border:${color};">
+            ${cat}
+          </div>
           `
 
         }).join("")
-
-
-        if (!expanded && hiddenCount > 0) {
-
-          categoriesContainer.innerHTML += `
-            <button
-              id="showMoreBtn"
-              class="category"
-              type="button">
-              +${hiddenCount}
-            </button>
-          `
-
-          document
-            .getElementById("showMoreBtn")
-            .onclick = function () {
-
-              expanded = true
-              renderCategories()
-
-            }
-
-        }
 
       }
 
@@ -72,9 +61,19 @@ async function loadData() {
 
     }
 
-  } catch (err) {
-    console.error("Error loading data:", err)
+    hideLoader()
+
   }
+
+  
+catch(err){
+ console.error(err)
+}
+
+finally{
+ hideLoader()
+}
+
 }
 
 window.addEventListener("DOMContentLoaded", loadData)
