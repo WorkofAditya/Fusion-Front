@@ -16,9 +16,17 @@ async function loadData() {
     const categories = await catRes.json()
 
     if (categoriesContainer) {
-      categoriesContainer.innerHTML = categories.map(cat =>
-        `<div class="category">${cat}</div>`
-      ).join("")
+      categoriesContainer.innerHTML = categories.map(cat => {
+        let cls = ""
+
+        if (cat.includes("Gaming")) cls = "cat-gaming"
+        else if (cat.includes("Electronic")) cls = "cat-electronics"
+        else if (cat.includes("Home")) cls = "cat-home"
+        else if (cat.includes("Gadgets")) cls = "cat-gadgets"
+        else if (cat.includes("Stationary")) cls = "cat-stationary"
+
+        return `<div class="category ${cls}">${cat}</div>`
+      }).join("")
     }
 
   } catch (err) {
