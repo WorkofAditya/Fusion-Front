@@ -163,9 +163,32 @@ body {
   border-color: #ddd6fe;
 }
 
+.category {
+  transition: 0.25s;
+}
+
+.cat-gaming:hover {
+  background: #c7d2fe;
+}
+
+.cat-electronics:hover {
+  background: #bbf7d0;
+}
+
+.cat-home:hover {
+  background: #fde68a;
+}
+
+.cat-gadgets:hover {
+  background: #fecdd3;
+}
+
+.cat-stationary:hover {
+  background: #ddd6fe;
+}
+
 .category:hover {
-  transform: translateY(-1px);
-  border-color: rgba(37, 99, 235, 0.25);
+  color: #111827;
 }
 
 .cat-gaming,
