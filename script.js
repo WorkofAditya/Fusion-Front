@@ -1,8 +1,10 @@
 const shopsContainer = document.getElementById("shops")
 const categoriesContainer = document.getElementById("categories")
 const usedColors = new Map()
+
 async function loadData() {
   try {
+
     const shopsRes = await fetch("https://fusion-back.onrender.com/shops")
     const shops = await shopsRes.json()
 
@@ -12,20 +14,62 @@ async function loadData() {
       ).join("")
     }
 
+
     const catRes = await fetch("https://fusion-back.onrender.com/categories")
     const categories = await catRes.json()
 
     if (categoriesContainer) {
-      categoriesContainer.innerHTML = categories.map(cat => {
-  const color = getColor(cat)
 
-  return `
-    <div class="category"
-         style="--border:${color};">
-      ${cat}
-    </div>
-  `
-}).join("")
+      let expanded = false
+
+      function renderCategories() {
+
+        const shown = expanded
+          ? categories
+          : categories.slice(0, 8)
+
+        const hiddenCount = categories.length - 8
+
+        categoriesContainer.innerHTML = shown.map(cat => {
+
+          const color = getColor(cat)
+
+          return `
+            <div class="category"
+                 style="--border:${color};">
+              ${cat}
+            </div>
+          `
+
+        }).join("")
+
+
+        if (!expanded && hiddenCount > 0) {
+
+          categoriesContainer.innerHTML += `
+            <button
+              id="showMoreBtn"
+              class="category"
+              type="button">
+              +${hiddenCount}
+            </button>
+          `
+
+          document
+            .getElementById("showMoreBtn")
+            .onclick = function () {
+
+              expanded = true
+              renderCategories()
+
+            }
+
+        }
+
+      }
+
+      renderCategories()
+
     }
 
   } catch (err) {
@@ -35,7 +79,9 @@ async function loadData() {
 
 window.addEventListener("DOMContentLoaded", loadData)
 
+
 function getColor(text) {
+
   const colors = [
     "#c7d2fe",
     "#bbf7d0",
@@ -58,11 +104,16 @@ function getColor(text) {
     return usedColors.get(text)
   }
 
-  const available = colors.filter(c => !Array.from(usedColors.values()).includes(c))
+  const available = colors.filter(
+    c => !Array.from(usedColors.values()).includes(c)
+  )
 
-  const pool = available.length ? available : colors
+  const pool = available.length
+    ? available
+    : colors
 
   let hash = 0
+
   for (let i = 0; i < text.length; i++) {
     hash = (hash * 31 + text.charCodeAt(i)) >>> 0
   }
