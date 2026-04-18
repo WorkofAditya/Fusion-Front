@@ -36,26 +36,49 @@ async function loadData() {
 
       function renderCategories() {
 
-        const shown = expanded
-          ? categories
-          : categories.slice(0,8)
+  const shown = expanded
+    ? categories
+    : categories.slice(0,8)
 
-        const hiddenCount = categories.length - 8
+  const hiddenCount = categories.length - 8
 
-        categoriesContainer.innerHTML = shown.map(cat => {
+  categoriesContainer.innerHTML = shown.map(cat => {
 
-          const color = getColor(cat)
+    const color = getColor(cat)
 
-          return `
-          <div class="category"
-               style="--border:${color};">
-            ${cat}
-          </div>
-          `
+    return `
+      <div class="category"
+           style="--border:${color};">
+        ${cat}
+      </div>
+    `
 
-        }).join("")
+  }).join("")
+
+
+  if (!expanded && hiddenCount > 0) {
+
+    categoriesContainer.innerHTML += `
+      <button
+        id="showMoreBtn"
+        class="category"
+        type="button">
+        +${hiddenCount}
+      </button>
+    `
+
+    document
+      .getElementById("showMoreBtn")
+      .onclick = function(){
+
+        expanded = true
+        renderCategories()
 
       }
+
+  }
+
+}
 
       renderCategories()
 
