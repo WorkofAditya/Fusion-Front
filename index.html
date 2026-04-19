@@ -9,9 +9,10 @@
 </head>
 <body>
   <div id="loader" class="loader-screen">
-  <div class="loader-spinner"></div>
-  <p>Loading Fusion...</p>
-</div>
+    <div class="loader-spinner"></div>
+    <p>Loading Fusion...</p>
+  </div>
+
   <main class="app">
     <nav class="nav">
       <div class="brand">fusionn.in</div>
@@ -19,55 +20,59 @@
     </nav>
 
     <section class="content">
-      <h1 class="logo">FUSION</h1>
+      <h1 class="logo" id="mainLogo">FUSION</h1>
 
       <div class="search-wrap">
         <div class="search-row">
-          <input type="text" placeholder="Find nearby products..." aria-label="Search products">
-          <button aria-label="Open filter menu">☰</button>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search shops and products..."
+            aria-label="Search shops and products"
+          >
+          <button id="filterBtn" aria-label="Open filter menu">☰</button>
         </div>
       </div>
 
       <section class="categories" id="categories"></section>
 
-  <h2 class="shops-title">Suggested shops</h2>
+      <h2 class="section-title" id="resultTitle">Suggested shops</h2>
+      <section class="result-grid" id="results"></section>
+    </section>
 
-      <section class="shops" id="shops"></section>
-      </section>
-      <footer class="footer">
-  <div class="footer-top">
-    <div class="footer-brand">FUSION</div>
-    <p class="footer-tagline">Find products from nearby shops, faster and smarter.</p>
-  </div>
+    <footer class="footer">
+      <div class="footer-top">
+        <div class="footer-brand">FUSION</div>
+        <p class="footer-tagline">Find products from nearby shops, faster and smarter.</p>
+      </div>
 
-  <div class="footer-grid">
-    <div class="footer-col">
-      <h4>Developers</h4>
-      <p>Adityasinh Sodha</p>
-      <p>Adityarajsinh Jadav</p>
-      <p>Madhav Tank</p>
-      <p>Prince Chovatiya</p>
-    </div>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Developers</h4>
+          <p>Adityasinh Sodha</p>
+          <p>Adityarajsinh Jadav</p>
+          <p>Madhav Tank</p>
+          <p>Prince Chovatiya</p>
+        </div>
 
-    <div class="footer-col">
-      <h4>Product</h4>
-      <p>Search</p>
-      <p>Categories</p>
-      <p>Shops</p>
-    </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <p>Search</p>
+          <p>Categories</p>
+          <p>Shops</p>
+        </div>
 
-    <div class="footer-col">
-      <h4>Contact</h4>
-      <p>work.adityasodha@gmail.com</p>
-      <p>+919712022202</p>
-    </div>
-  </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <p>work.adityasodha@gmail.com</p>
+          <p>+919712022202</p>
+        </div>
+      </div>
 
-  <div class="footer-bottom">
-    <p>© 2026 Fusion. All rights reserved.</p>
-  </div>
-</footer>
-
+      <div class="footer-bottom">
+        <p>© 2026 Fusion. All rights reserved.</p>
+      </div>
+    </footer>
   </main>
 
 <script src="script.js"></script>
