@@ -151,7 +151,7 @@ function renderResults() {
     resultTitle.textContent = `${state.selectedCategory} Products`
   } else {
     mainLogo?.classList.remove("hidden")
-    resultTitle.textContent = isSearching ? "Search results" : "Suggested shops"
+    resultTitle.textContent = isSearching ? "Search results" : "Suggested shops & products"
   }
 
   const productCards = filteredProducts.map(
