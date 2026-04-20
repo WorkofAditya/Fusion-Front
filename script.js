@@ -1,11 +1,11 @@
-const API_BASE = "https://fusion-back.onrender.com"
+const API_BASE = "https://fusion-back.onrender.com";
 const INITIAL_CATEGORY_COUNT = 8
 
 const usedColors = new Map()
 
 const categoriesContainer = document.getElementById("categories")
-const resultsContainer = document.getElementById("results")
-const resultTitle = document.getElementById("resultTitle")
+const shopsResults = document.getElementById("shopsResults")
+const productsResults = document.getElementById("productsResults")
 const searchInput = document.getElementById("searchInput")
 const filterBtn = document.getElementById("filterBtn")
 const mainLogo = document.getElementById("mainLogo")
@@ -117,71 +117,107 @@ function renderCategories() {
 }
 
 function renderResults() {
-  if (!resultsContainer || !resultTitle) return
 
-  const searchTerm = state.searchTerm.trim().toLowerCase()
-  const isSearching = Boolean(searchTerm)
-  const hasCategory = !isSearching && Boolean(state.selectedCategory)
+const searchTerm=state.searchTerm.trim().toLowerCase()
+const isSearching=Boolean(searchTerm)
+const hasCategory=!isSearching && Boolean(state.selectedCategory)
 
-  categoriesContainer?.classList.toggle("hidden", isSearching)
+categoriesContainer?.classList.toggle("hidden",isSearching)
 
-  const filteredProducts = state.products.filter((product) => {
-    const categoryMatch = !hasCategory || product.category === state.selectedCategory
-    const searchMatch =
-      !searchTerm ||
-      product.name.toLowerCase().includes(searchTerm) ||
-      product.category.toLowerCase().includes(searchTerm) ||
-      (product.description || "").toLowerCase().includes(searchTerm)
+const filteredProducts=state.products.filter((product)=>{
 
-    return categoryMatch && searchMatch
-  })
+const categoryMatch=
+!hasCategory || product.category===state.selectedCategory
 
-  const filteredShops = hasCategory
-    ? []
-    : state.shops.filter((shop) => {
-        if (!searchTerm) return true
-        return (
-          shop.name.toLowerCase().includes(searchTerm) ||
-          shop.category.toLowerCase().includes(searchTerm)
-        )
-      })
+const searchMatch=
+!searchTerm ||
+product.name.toLowerCase().includes(searchTerm) ||
+product.category.toLowerCase().includes(searchTerm) ||
+(product.description || "").toLowerCase().includes(searchTerm)
 
-  if (hasCategory) {
-    mainLogo?.classList.add("hidden")
-    resultTitle.textContent = `${state.selectedCategory} Products`
-  } else {
-    mainLogo?.classList.remove("hidden")
-    resultTitle.textContent = isSearching ? "Search results" : "Suggested shops & products"
-  }
+return categoryMatch && searchMatch
 
-  const productCards = filteredProducts.map(
-    (product) => `
-      <a class="product-link" href="product.html?id=${product._id}" aria-label="Open ${product.name} details">
-        <article class="product-card">
-          <img class="product-image" src="${product.image}" alt="${product.name}" loading="lazy">
-          <div class="product-meta">
-            <h3>${product.name}</h3>
-            <p class="product-category">${product.category}</p>
-            <p class="product-description">${product.description || ""}</p>
-          </div>
-        </article>
-      </a>`
-  )
+})
 
-  const shopCards = filteredShops.map(
-    (shop) => `
-      <article class="shop-card">
-        <h3>${shop.name}</h3>
-        <p>${shop.category}</p>
-      </article>`
-  )
 
-  const cards = hasCategory ? productCards : [...shopCards, ...productCards]
+const filteredShops=hasCategory
+? []
+: state.shops.filter((shop)=>{
 
-  resultsContainer.innerHTML =
-    cards.length > 0
-      ? cards.join("")
-      : `<div class="empty-state">No matching shops or products found.</div>`
+if(!searchTerm) return true
+
+return(
+shop.name.toLowerCase().includes(searchTerm) ||
+shop.category.toLowerCase().includes(searchTerm)
+)
+
+})
+
+
+if(hasCategory){
+
+mainLogo?.classList.add("hidden")
+
+}else{
+
+mainLogo?.classList.remove("hidden")
+
+}
+
+
+shopsResults.innerHTML=
+
+filteredShops.length
+? filteredShops.map(shop=>`
+
+<article class="shop-card">
+<h3>${shop.name}</h3>
+<p>${shop.category}</p>
+</article>
+
+`).join("")
+:
+`<div class="empty-state">No shops found.</div>`
+
+
+productsResults.innerHTML=
+
+filteredProducts.length
+? filteredProducts.map(product=>`
+
+<a class="product-link"
+href="product.html?id=${product._id}"
+aria-label="Open ${product.name} details">
+
+<article class="product-card">
+
+<img
+class="product-image"
+src="${product.image}"
+alt="${product.name}"
+loading="lazy">
+
+<div class="product-meta">
+<h3>${product.name}</h3>
+
+<p class="product-category">
+${product.category}
+</p>
+
+<p class="product-description">
+${product.description || ""}
+</p>
+
+</div>
+
+</article>
+
+</a>
+
+`).join("")
+:
+`<div class="empty-state">No products found.</div>`
+
 }
 
 async function loadData() {
