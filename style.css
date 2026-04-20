@@ -340,3 +340,150 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------------- MOBILE-FIRST IMPROVEMENTS ---------------- */
+
+@media (max-width: 768px){
+
+.nav{
+height:52px;
+padding:0 14px;
+}
+
+.brand{
+font-size:.95rem;
+}
+
+.content{
+padding:14px;
+}
+
+.logo{
+font-size:2rem;
+letter-spacing:1px;
+margin:8px 0 18px;
+}
+
+.search-wrap{
+margin-bottom:18px;
+}
+
+.search-row{
+padding:4px;
+border-radius:16px;
+box-shadow:none;
+}
+
+.search-row input{
+height:40px;
+font-size:.95rem;
+padding:0 10px;
+}
+
+.search-row button{
+width:38px;
+height:38px;
+}
+
+.categories{
+justify-content:flex-start;
+overflow-x:auto;
+flex-wrap:nowrap;
+padding-bottom:8px;
+gap:8px;
+margin:16px 0 22px;
+}
+
+.categories::-webkit-scrollbar{
+display:none;
+}
+
+.category{
+white-space:nowrap;
+font-size:.8rem;
+padding:8px 12px;
+}
+
+.section-title{
+font-size:1rem;
+margin-bottom:12px;
+}
+
+.result-grid{
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.shop-card,
+.product-card{
+padding:10px;
+border-radius:14px;
+}
+
+.product-image{
+border-radius:10px;
+margin-bottom:8px;
+}
+
+.shop-card h3,
+.product-meta h3{
+font-size:.9rem;
+}
+
+.product-category{
+font-size:.75rem;
+}
+
+.product-description,
+.shop-card p{
+font-size:.78rem;
+line-height:1.2;
+}
+
+.footer{
+margin-top:40px;
+padding:25px 18px;
+}
+
+.footer-grid{
+grid-template-columns:1fr;
+gap:20px;
+text-align:center;
+}
+
+.footer-col p{
+font-size:.8rem;
+}
+
+}
+
+/* EXTRA SMALL PHONES */
+
+@media (max-width:480px){
+
+.result-grid{
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.logo{
+font-size:1.7rem;
+}
+
+.search-row input{
+font-size:.85rem;
+}
+
+.shop-card,
+.product-card{
+padding:9px;
+}
+
+}
+
+.product-description{
+display:-webkit-box;
+-webkit-line-clamp:2;
+-webkit-box-orient:vertical;
+overflow:hidden;
+}
