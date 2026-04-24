@@ -76,7 +76,7 @@ button:hover {
 #toast {
   position: fixed;
   bottom: 20px;
-  right: 20px
+  right: 20px;
   background: #111;
   color: #fff;
   padding: 12px 18px;
@@ -297,7 +297,9 @@ async function login() {
   if (data.success) {
     loginBox.style.display = 'none'
     panel.style.display = 'block'
-    loadCollections()
+    await loadCollections()
+    collection.value = "shops"
+    loadData()
   } else {
     alert('Wrong password')
   }
