@@ -1,4 +1,4 @@
-const ADMIN_STATIC_CACHE = "fusion-admin-static-v1";
+const ADMIN_STATIC_CACHE = "fusion-admin-static-v2";
 const ADMIN_DYNAMIC_CACHE = "fusion-admin-dynamic-v1";
 
 const ADMIN_SHELL = [
