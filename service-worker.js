@@ -1,4 +1,4 @@
-const STATIC_CACHE = "fusion-static-v1";
+const STATIC_CACHE = "fusion-static-v2";
 const DYNAMIC_CACHE = "fusion-dynamic-v1";
 
 const APP_SHELL = [
