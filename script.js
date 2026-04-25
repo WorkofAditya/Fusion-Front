@@ -1,5 +1,7 @@
 const API_BASE = "https://fusion-back.onrender.com";
 const INITIAL_CATEGORY_COUNT = 8
+const MAX_HOME_SHOPS = 5
+const MAX_HOME_PRODUCTS = 8
 
 const usedColors = new Map()
 
@@ -17,47 +19,31 @@ const state = {
   products: [],
   selectedCategory: null,
   searchTerm: "",
-  categoriesExpanded: false
+  categoriesExpanded: false,
+  currentShopIndex: 0
 }
 
+let shopAutoSlide = null
+
 function showLoader() {
-  if (loader) loader.classList.remove("hidden")
+  loader?.classList.remove("hidden")
 }
 
 function hideLoader() {
-  if (loader) loader.classList.add("hidden")
+  loader?.classList.add("hidden")
 }
 
 function getColor(text) {
-  const colors = [
-    "#c7d2fe",
-    "#bbf7d0",
-    "#fde68a",
-    "#fecdd3",
-    "#ddd6fe",
-    "#bae6fd",
-    "#a7f3d0",
-    "#fdba74",
-    "#f9a8d4",
-    "#93c5fd",
-    "#86efac",
-    "#fcd34d",
-    "#fca5a5",
-    "#c4b5fd",
-    "#67e8f9"
-  ]
+  const colors = ["#c7d2fe","#bbf7d0","#fde68a","#fecdd3","#ddd6fe","#bae6fd","#a7f3d0","#fdba74","#f9a8d4","#93c5fd","#86efac","#fcd34d","#fca5a5","#c4b5fd","#67e8f9"]
 
   if (usedColors.has(text)) return usedColors.get(text)
 
-  const available = colors.filter((c) => !Array.from(usedColors.values()).includes(c))
-  const pool = available.length ? available : colors
-
   let hash = 0
-  for (let i = 0; i < text.length; i += 1) {
+  for (let i = 0; i < text.length; i++) {
     hash = (hash * 31 + text.charCodeAt(i)) >>> 0
   }
 
-  const color = pool[hash % pool.length]
+  const color = colors[hash % colors.length]
   usedColors.set(text, color)
   return color
 }
@@ -71,197 +57,189 @@ function renderCategories() {
 
   const hiddenCount = Math.max(0, state.categories.length - INITIAL_CATEGORY_COUNT)
 
-  const markup = [
+  categoriesContainer.innerHTML = [
     `<button class="category ${state.selectedCategory ? "" : "active"}" data-category="">All</button>`,
-    ...visibleCategories.map((category) => {
-      const activeClass = category === state.selectedCategory ? "active" : ""
-      const color = getColor(category)
-      return `
-        <button
-          class="category ${activeClass}"
-          data-category="${category}"
-          type="button"
-          style="--border:${color};"
-        >
-          ${category}
-        </button>`
-    })
-  ]
-
-  if (!state.categoriesExpanded && hiddenCount > 0) {
-    markup.push(`
-      <button class="category" id="showMoreBtn" type="button">
-        +${hiddenCount}
+    ...visibleCategories.map(c => `
+      <button class="category ${c === state.selectedCategory ? "active" : ""}" data-category="${c}" style="--border:${getColor(c)};">
+        ${c}
       </button>
-    `)
-  }
+    `),
+    (!state.categoriesExpanded && hiddenCount > 0)
+      ? `<button class="category" id="showMoreBtn">+${hiddenCount}</button>`
+      : ""
+  ].join("")
 
-  categoriesContainer.innerHTML = markup.join("")
-
-  categoriesContainer.querySelectorAll(".category[data-category]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const category = btn.dataset.category || null
-      state.selectedCategory = category
+  categoriesContainer.querySelectorAll(".category[data-category]").forEach(btn => {
+    btn.onclick = () => {
+      state.selectedCategory = btn.dataset.category || null
       renderCategories()
       renderResults()
-    })
+    }
   })
 
-  const showMoreBtn = document.getElementById("showMoreBtn")
-  if (showMoreBtn) {
-    showMoreBtn.addEventListener("click", () => {
-      state.categoriesExpanded = true
-      renderCategories()
-    })
-  }
+  document.getElementById("showMoreBtn")?.addEventListener("click", () => {
+    state.categoriesExpanded = true
+    renderCategories()
+  })
 }
 
 function renderResults() {
 
-const searchTerm=state.searchTerm.trim().toLowerCase()
-const isSearching=Boolean(searchTerm)
-const hasCategory=!isSearching && Boolean(state.selectedCategory)
+  const searchTerm = state.searchTerm.trim().toLowerCase()
+  const isSearching = Boolean(searchTerm)
+  const hasCategory = Boolean(state.selectedCategory)
+  const isDefaultView = !isSearching && !hasCategory
 
-categoriesContainer?.classList.toggle("hidden",isSearching)
+  categoriesContainer?.classList.toggle("hidden", isSearching)
 
-const filteredProducts=state.products.filter((product)=>{
+  const filteredProducts = state.products.filter(p => {
+    const categoryMatch = !hasCategory || p.category === state.selectedCategory
+    const searchMatch =
+      !searchTerm ||
+      p.name.toLowerCase().includes(searchTerm) ||
+      p.category.toLowerCase().includes(searchTerm) ||
+      (p.description || "").toLowerCase().includes(searchTerm)
 
-const categoryMatch=
-!hasCategory || product.category===state.selectedCategory
+    return categoryMatch && searchMatch
+  })
 
-const searchMatch=
-!searchTerm ||
-product.name.toLowerCase().includes(searchTerm) ||
-product.category.toLowerCase().includes(searchTerm) ||
-(product.description || "").toLowerCase().includes(searchTerm)
+  const visibleProducts = isDefaultView
+    ? filteredProducts.slice(0, MAX_HOME_PRODUCTS)
+    : filteredProducts
 
-return categoryMatch && searchMatch
+  const filteredShops = state.shops.filter(s => {
+    if (!searchTerm && !state.selectedCategory) return true
 
-})
+    const searchMatch =
+      !searchTerm ||
+      s.name.toLowerCase().includes(searchTerm) ||
+      s.category.toLowerCase().includes(searchTerm)
 
+    const categoryMatch =
+      !state.selectedCategory ||
+      s.category === state.selectedCategory
 
-const filteredShops=hasCategory
-? []
-: state.shops.filter((shop)=>{
+    return searchMatch && categoryMatch
+  })
 
-if(!searchTerm) return true
+  const visibleShops = isDefaultView
+    ? filteredShops.slice(0, MAX_HOME_SHOPS)
+    : filteredShops
 
-return(
-shop.name.toLowerCase().includes(searchTerm) ||
-shop.category.toLowerCase().includes(searchTerm)
-)
+  state.currentShopIndex = 0
 
-})
+  mainLogo?.classList.toggle("hidden", hasCategory)
 
+  if (visibleShops.length) {
+    renderShopSlider(visibleShops)
 
-if(hasCategory){
+    clearInterval(shopAutoSlide)
 
-mainLogo?.classList.add("hidden")
+    if (visibleShops.length > 1) {
+      shopAutoSlide = setInterval(() => {
+        slideTo(1, visibleShops)
+      }, 2000)
+    }
+  } else {
+    shopsResults.innerHTML = `<div class="empty-state">No shops found.</div>`
+    clearInterval(shopAutoSlide)
+  }
 
-}else{
-
-mainLogo?.classList.remove("hidden")
-
+  productsResults.innerHTML = visibleProducts.length
+    ? visibleProducts.map(p => `
+      <a class="product-link" href="product.html?id=${p._id}">
+        <article class="product-card">
+          <img class="product-image" src="${p.image}">
+          <div class="product-meta">
+            <h3>${p.name}</h3>
+            <p class="product-category">${p.category}</p>
+            <p class="product-description">${p.description || ""}</p>
+          </div>
+        </article>
+      </a>
+    `).join("")
+    : `<div class="empty-state">No products found.</div>`
 }
 
+function renderShopSlider(shops) {
 
-shopsResults.innerHTML=
+  const current = shops[state.currentShopIndex]
+  const next = shops[(state.currentShopIndex + 1) % shops.length]
 
-filteredShops.length
-? filteredShops.map(shop=>`
+  shopsResults.innerHTML = `
+    <div class="shop-slide">
+      <div class="shop-slide-inner" id="sliderTrack">
+        
+        <div class="shop-slide-item">
+          <img src="${current.image}">
+          <div class="shop-overlay">${current.name}</div>
+        </div>
 
-<article class="shop-card">
-<h3>${shop.name}</h3>
-<p>${shop.category}</p>
-</article>
+        <div class="shop-slide-item">
+          <img src="${next.image}">
+          <div class="shop-overlay">${next.name}</div>
+        </div>
 
-`).join("")
-:
-`<div class="empty-state">No shops found.</div>`
+      </div>
 
+      <button class="shop-nav shop-prev">&#60;</button>
+      <button class="shop-nav shop-next">&#62;</button>
+    </div>
 
-productsResults.innerHTML=
+    <div class="shop-dots">
+      ${shops.map((_, i) => `
+        <div class="shop-dot ${i === state.currentShopIndex ? "active" : ""}"></div>
+      `).join("")}
+    </div>
+  `
 
-filteredProducts.length
-? filteredProducts.map(product=>`
+  const prev = shopsResults.querySelector(".shop-prev")
+  const nextBtn = shopsResults.querySelector(".shop-next")
 
-<a class="product-link"
-href="product.html?id=${product._id}"
-aria-label="Open ${product.name} details">
+  prev.onclick = () => slideTo(-1, shops)
+  nextBtn.onclick = () => slideTo(1, shops)
+}
 
-<article class="product-card">
+function slideTo(direction, shops) {
 
-<img
-class="product-image"
-src="${product.image}"
-alt="${product.name}"
-loading="lazy">
+  const track = document.getElementById("sliderTrack")
 
-<div class="product-meta">
-<h3>${product.name}</h3>
+  track.style.transform = `translateX(${direction === 1 ? "-100%" : "100%"})`
 
-<p class="product-category">
-${product.category}
-</p>
-
-<p class="product-description">
-${product.description || ""}
-</p>
-
-</div>
-
-</article>
-
-</a>
-
-`).join("")
-:
-`<div class="empty-state">No products found.</div>`
-
+  setTimeout(() => {
+    state.currentShopIndex =
+      (state.currentShopIndex + direction + shops.length) % shops.length
+    renderShopSlider(shops)
+  }, 400)
 }
 
 async function loadData() {
   showLoader()
-
   try {
-    const [shopsRes, catRes, productsRes] = await Promise.all([
+    const [s, c, p] = await Promise.all([
       fetch(`${API_BASE}/shops`),
       fetch(`${API_BASE}/categories`),
       fetch(`${API_BASE}/products`)
     ])
 
-    state.shops = await shopsRes.json()
-    state.categories = await catRes.json()
-    state.products = await productsRes.json()
+    state.shops = await s.json()
+    state.categories = await c.json()
+    state.products = await p.json()
 
     renderCategories()
     renderResults()
-  } catch (error) {
-    console.error(error)
-    if (resultsContainer) {
-      resultsContainer.innerHTML =
-        "<div class='empty-state'>Unable to load data.</div>"
-    }
+  } catch {
+    shopsResults.innerHTML = "<div class='empty-state'>Unable to load data.</div>"
   } finally {
     hideLoader()
   }
 }
 
-searchInput?.addEventListener("input", (event) => {
-  state.searchTerm = event.target.value
+searchInput?.addEventListener("input", e => {
+  state.searchTerm = e.target.value
   renderResults()
 })
 
-filterBtn?.addEventListener("click", () => {
-  searchInput?.focus()
-})
+filterBtn?.addEventListener("click", () => searchInput?.focus())
 
 window.addEventListener("DOMContentLoaded", loadData)
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js").catch((error) => {
-      console.error("Service worker registration failed:", error)
-    })
-  })
-}
