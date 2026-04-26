@@ -286,18 +286,38 @@ button:hover {
 <script>
 const API = "https://fusion-back.onrender.com"
 
+let ADMIN_TOKEN = localStorage.getItem("admin_token") || ""
+
+function getHeaders(json = false) {
+  const headers = {
+    Authorization: "Bearer " + ADMIN_TOKEN
+  }
+  if (json) headers['Content-Type'] = 'application/json'
+  return headers
+}
+
 async function login() {
   const res = await fetch(API + '/login', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ password: pass.value })
   })
+
   const data = await res.json()
 
-  if (data.success) {
+  if (data.token) {
+    ADMIN_TOKEN = data.token
+    localStorage.setItem("admin_token", ADMIN_TOKEN)
+
     loginBox.style.display = 'none'
     panel.style.display = 'block'
-    await loadCollections()
+
+    collection.innerHTML = `
+      <option value="shops">shops</option>
+      <option value="products">products</option>
+      <option value="categories">categories</option>
+    `
+
     collection.value = "shops"
     loadData()
   } else {
@@ -305,31 +325,20 @@ async function login() {
   }
 }
 
-async function loadCollections() {
-  try {
-    const res = await fetch(API + '/collections')
-    const cols = await res.json()
-
-    collection.innerHTML = ''
-    cols.forEach(c => {
-      let opt = document.createElement('option')
-      opt.value = c
-      opt.innerText = c
-      collection.appendChild(opt)
-    })
-  } catch {
-    collection.innerHTML = `
-      <option value="products">products</option>
-      <option value="shops">shops</option>
-    `
-  }
-}
-
 async function loadData() {
   showLoader()
 
   try {
-    const res = await fetch(API + '/data/' + collection.value)
+    const res = await fetch(API + '/data/' + collection.value, {
+      headers: getHeaders()
+    })
+
+    if (res.status === 401) {
+      localStorage.removeItem("admin_token")
+      location.reload()
+      return
+    }
+
     const data = await res.json()
 
     const dataDiv = document.getElementById('data')
@@ -385,14 +394,12 @@ async function loadData() {
         }
 
         td.innerHTML = value || ''
-        td.setAttribute('data-label', key)
         td.style.padding = '10px'
         td.style.border = '1px solid #eee'
         tr.appendChild(td)
       })
 
       const actionTd = document.createElement('td')
-      actionTd.style.whiteSpace = 'nowrap'
 
       actionTd.innerHTML = `
         <button onclick="editRow(this, '${item._id}')">Edit</button>
@@ -416,7 +423,6 @@ async function loadData() {
   } catch (err) {
     hideLoader()
     showToast("Failed to load data", "error")
-    console.error(err)
   }
 }
 
@@ -433,9 +439,8 @@ function addRow() {
 
   keys.forEach(key => {
     const td = document.createElement('td')
-
     const input = document.createElement('input')
-    input.style.fontSize = '16px'
+
     input.placeholder = key
     input.style.width = '100%'
 
@@ -445,12 +450,10 @@ function addRow() {
 
   const actionTd = document.createElement('td')
 
-  actionTd.style.whiteSpace = 'nowrap'
-
-actionTd.innerHTML = `
-  <button onclick="saveRow(this)">Save</button>
-  <button onclick="this.parentElement.parentElement.remove()">Cancel</button>
-`
+  actionTd.innerHTML = `
+    <button onclick="saveRow(this)">Save</button>
+    <button onclick="this.parentElement.parentElement.remove()">Cancel</button>
+  `
 
   tr.appendChild(actionTd)
   tbody.appendChild(tr)
@@ -468,12 +471,12 @@ async function saveRow(btn) {
   try {
     const res = await fetch(API + '/add/' + collection.value, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: getHeaders(true),
       body: JSON.stringify(obj)
     })
 
     if (res.ok) {
-      showToast("Added successfully", "success")
+      showToast("Added successfully")
       loadData()
     } else {
       showToast("Add failed", "error")
@@ -506,19 +509,18 @@ async function updateRow(btn, id) {
   const obj = {}
 
   inputs.forEach((input, i) => {
-    const key = headers[i].innerText
-    obj[key] = input.value
+    obj[headers[i].innerText] = input.value
   })
 
   try {
     const res = await fetch(API + '/update/' + collection.value + '/' + id, {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
+      headers: getHeaders(true),
       body: JSON.stringify(obj)
     })
 
     if (res.ok) {
-      showToast("Updated successfully", "success")
+      showToast("Updated successfully")
       loadData()
     } else {
       showToast("Update failed", "error")
@@ -529,16 +531,16 @@ async function updateRow(btn, id) {
 }
 
 async function del(id) {
-  const confirmDelete = confirm("Are you sure you want to delete this item?")
-  if (!confirmDelete) return
+  if (!confirm("Are you sure?")) return
 
   try {
     const res = await fetch(API + '/delete/' + collection.value + '/' + id, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getHeaders()
     })
 
     if (res.ok) {
-      showToast("Deleted successfully", "success")
+      showToast("Deleted successfully")
       loadData()
     } else {
       showToast("Delete failed", "error")
@@ -550,7 +552,6 @@ async function del(id) {
 
 function showToast(message, type = 'success') {
   const toast = document.getElementById('toast')
-
   toast.innerText = message
   toast.className = 'show ' + type
 
@@ -567,14 +568,26 @@ function hideLoader() {
   document.getElementById('loader').style.display = 'none'
 }
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/admin-service-worker.js', { scope: '/admin.html' }).catch((error) => {
-      console.error('Admin service worker registration failed:', error)
-    })
-  })
+// auto login
+if (ADMIN_TOKEN) {
+  loginBox.style.display = 'none'
+  panel.style.display = 'block'
+
+  collection.innerHTML = `
+    <option value="shops">shops</option>
+    <option value="products">products</option>
+    <option value="categories">categories</option>
+  `
+
+  collection.value = "shops"
+  loadData()
 }
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/admin-service-worker.js', { scope: '/admin.html' }).catch(() => {})
+  })
+}
 </script>
 <div id="toast"></div>
 <div id="loader">
