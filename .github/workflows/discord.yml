@@ -6,11 +6,17 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
+
     steps:
       - name: Send to Discord
+        env:
+          COMMITS_JSON: ${{ toJson(github.event.commits) }}
         run: |
-          COMMITS=$(echo '${{ toJson(github.event.commits) }}' | jq -r '.[].message' | sed 's/^/- /')
+          DATE=$(date -u +"%d %B %Y")
+
+          COMMITS=$(echo "$COMMITS_JSON" | jq -r '.[] | "- " + (.id[0:6]) + ": " + (.message | split("\n")[0])')
+
           curl -H "Content-Type: application/json" \
           -X POST \
-          -d "{\"content\":\"New commits:\n$COMMITS\"}" \
+          -d "$(jq -n --arg text "$DATE\n$COMMITS" '{content: $text}')" \
           ${{ secrets.DISCORD_WEBHOOK }}
