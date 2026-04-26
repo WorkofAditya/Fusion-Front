@@ -15,7 +15,7 @@ jobs:
 
       - name: Send commits in chunks
         run: |
-          COMMITS=$(git log --pretty=format:"- %h: %s")
+          COMMITS=$(git log --reverse --pretty=format:"- %h: %s")
 
           echo "$COMMITS" | while IFS= read -r line; do
             RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
