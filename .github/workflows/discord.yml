@@ -15,18 +15,9 @@ jobs:
 
       - name: Send commits in chunks
         run: |
-          echo "Frontend update" | while read header; do
-            RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
-              -H "Content-Type: application/json" \
-              -X POST \
-              -d "$(jq -n --arg text "$header" '{content: $text}')" \
-              ${{ secrets.DISCORD_WEBHOOK }})
+          COMMITS=$(git log --reverse --pretty=format:"- (frontend): %h %s")
 
-            echo "HTTP: $RESPONSE"
-            cat response.txt
-          done
-
-          git log --reverse --pretty=format:"- %h: %s" | while IFS= read -r line; do
+          echo "$COMMITS" | while IFS= read -r line; do
             RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
               -H "Content-Type: application/json" \
               -X POST \
