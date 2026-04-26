@@ -13,11 +13,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Send all commits to Discord
+      - name: Send commits in chunks
         run: |
           COMMITS=$(git log --pretty=format:"- %h: %s")
 
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "$(jq -n --arg text "$COMMITS" '{content: $text}')" \
-          ${{ secrets.DISCORD_WEBHOOK }}
+          echo "$COMMITS" | while IFS= read -r line; do
+            RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d "$(jq -n --arg text "$line" '{content: $text}')" \
+              ${{ secrets.DISCORD_WEBHOOK }})
+
+            echo "HTTP: $RESPONSE"
+            cat response.txt
+          done
