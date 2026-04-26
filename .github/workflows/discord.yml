@@ -1,0 +1,16 @@
+name: Send commits to Discord
+
+on:
+  push:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send to Discord
+        run: |
+          COMMITS=$(echo '${{ toJson(github.event.commits) }}' | jq -r '.[].message' | sed 's/^/- /')
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\":\"New commits:\n$COMMITS\"}" \
+          ${{ secrets.DISCORD_WEBHOOK }}
