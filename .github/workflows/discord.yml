@@ -12,11 +12,11 @@ jobs:
         env:
           COMMITS_JSON: ${{ toJson(github.event.commits) }}
         run: |
-          DATE=$(date -u +"%d %B %Y")
-
           COMMITS=$(echo "$COMMITS_JSON" | jq -r '.[] | "- " + (.id[0:6]) + ": " + (.message | split("\n")[0])')
+
+          PAYLOAD=$(printf '{"content":"%s"}' "$COMMITS")
 
           curl -H "Content-Type: application/json" \
           -X POST \
-          -d "$(jq -n --arg text "$DATE\n$COMMITS" '{content: $text}')" \
+          -d "$PAYLOAD" \
           ${{ secrets.DISCORD_WEBHOOK }}
