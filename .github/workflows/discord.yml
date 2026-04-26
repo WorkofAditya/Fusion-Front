@@ -1,29 +1,22 @@
-name: Send full commit history to Discord
+name: Send commits to Discord
 
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
   notify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Send commits in chunks
+      - name: Send to Discord
+        env:
+          COMMITS_JSON: ${{ toJson(github.event.commits) }}
         run: |
-          COMMITS=$(git log --reverse --pretty=format:"- %h: %s")
+          COMMITS=$(echo "$COMMITS_JSON" | jq -r '.[] | "- " + (.id[0:6]) + ": " + (.message | split("\n")[0])')
 
-          echo "$COMMITS" | while IFS= read -r line; do
-            RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
-              -H "Content-Type: application/json" \
-              -X POST \
-              -d "$(jq -n --arg text "$line" '{content: $text}')" \
-              ${{ secrets.DISCORD_WEBHOOK }})
+          PAYLOAD=$(printf '{"content":"%s"}' "$COMMITS")
 
-            echo "HTTP: $RESPONSE"
-            cat response.txt
-          done
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "$PAYLOAD" \
+          ${{ secrets.DISCORD_WEBHOOK }}
